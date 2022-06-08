@@ -10,9 +10,10 @@ while True:
     # Capture the video frame
     # by frame
     ret, frame = vid.read()
+    if ret:
 
-    # Display the resulting frame
-    cv2.imshow("frame", frame)
+        # Display the resulting frame
+        cv2.imshow("frame", frame)
 
     # the 'q' button is set as the
     # quitting button you may use any
