@@ -13,10 +13,10 @@ pose = mp_pose.Pose()
 # Start endless loop to create video frame by frame Add details about video size and image post-processing to better identify bodies
 while True:
     ret, frame = cap.read()
-    flipped = cv2.flip(frame, flipCode=1)
-    # frame1 = cv2.resize(flipped, (640, 480))
-    rgb_img = cv2.cvtColor(flipped, cv2.COLOR_BGR2RGB)
-    result = pose.process(rgb_img)
+    # flipped = cv2.flip(frame, flipCode=1)
+    # # frame1 = cv2.resize(flipped, (640, 480))
+    # rgb_img = cv2.cvtColor(flipped, cv2.COLOR_BGR2RGB)
+    # result = pose.process(rgb_img)
     # Print general details about observed body
     # print(result.pose_landmarks)
 
@@ -29,8 +29,8 @@ while True:
     #    pass
 
     # Draw the framework of body onto the processed image and then show it in the preview window
-    mpDraw.draw_landmarks(frame1, result.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-    cv2.imshow("frame", frame1)
+    # mpDraw.draw_landmarks(frame1, result.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+    cv2.imshow("frame", frame)
 
     # At any point if the | q | is pressed on the keyboard then the system will stop
     key = cv2.waitKey(1) & 0xFF
