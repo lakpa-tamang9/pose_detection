@@ -14,11 +14,11 @@ pose = mp_pose.Pose()
 while True:
     ret, frame = cap.read()
     flipped = cv2.flip(frame, flipCode=1)
-    frame1 = cv2.resize(flipped, (640, 480))
-    rgb_img = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+    # frame1 = cv2.resize(flipped, (640, 480))
+    rgb_img = cv2.cvtColor(flipped, cv2.COLOR_BGR2RGB)
     result = pose.process(rgb_img)
     # Print general details about observed body
-    print(result.pose_landmarks)
+    # print(result.pose_landmarks)
 
     # Uncomment below to see X,Y coordinate Details on single location in this case the Nose Location.
 
