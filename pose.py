@@ -1,16 +1,12 @@
-# Import all important functionality
 import cv2
 import mediapipe as mp
-
-# Start cv2 video capturing through CSI port
-cap = cv2.VideoCapture(0)
-
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 # For webcam input:
 cap = cv2.VideoCapture(0)
+print("Testing")
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
     while cap.isOpened():
         success, image = cap.read()
@@ -21,7 +17,6 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
 
         # To improve performance, optionally mark the image as not writeable to
         # pass by reference.
-        print("Loaded image")
         image.flags.writeable = False
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = pose.process(image)
