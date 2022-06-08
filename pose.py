@@ -5,34 +5,37 @@ import mediapipe as mp
 # Start cv2 video capturing through CSI port
 cap = cv2.VideoCapture(0)
 
-# Initialise Media Pipe Pose features
+
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
-mpDraw = mp.solutions.drawing_utils
-pose = mp_pose.Pose()
+# For webcam input:
+cap = cv2.VideoCapture(0)
+with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+    while cap.isOpened():
+        success, image = cap.read()
+        if not success:
+            print("Ignoring empty camera frame.")
+            # If loading a video, use 'break' instead of 'continue'.
+            continue
 
-# Start endless loop to create video frame by frame Add details about video size and image post-processing to better identify bodies
-while True:
-    ret, frame = cap.read()
-    # flipped = cv2.flip(frame, flipCode=1)
-    # # frame1 = cv2.resize(flipped, (640, 480))
-    # rgb_img = cv2.cvtColor(flipped, cv2.COLOR_BGR2RGB)
-    # result = pose.process(rgb_img)
-    # Print general details about observed body
-    # print(result.pose_landmarks)
+        # To improve performance, optionally mark the image as not writeable to
+        # pass by reference.
+        image.flags.writeable = False
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pose.process(image)
 
-    # Uncomment below to see X,Y coordinate Details on single location in this case the Nose Location.
-
-    # try:
-    #    print('X Coords are', result.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].x * 640)
-    #    print('Y Coords are', result.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].y * 480)
-    # except:
-    #    pass
-
-    # Draw the framework of body onto the processed image and then show it in the preview window
-    # mpDraw.draw_landmarks(frame1, result.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-    cv2.imshow("frame", frame)
-
-    # At any point if the | q | is pressed on the keyboard then the system will stop
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q"):
-        break
+        # Draw the pose annotation on the image.
+        image.flags.writeable = True
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        mp_drawing.draw_landmarks(
+            image,
+            results.pose_landmarks,
+            mp_pose.POSE_CONNECTIONS,
+            landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style(),
+        )
+        # Flip the image horizontally for a selfie-view display.
+        cv2.imshow("MediaPipe Pose", cv2.flip(image, 1))
+        if cv2.waitKey(5) & 0xFF == 27:
+            break
+cap.release()
