@@ -1,9 +1,8 @@
-import argparse
-import json
-
-import cv2
-import numpy as np
 import tensorflow as tf
+import numpy as np
+import cv2
+import json
+import argparse
 
 
 def drawKeypoints(frame, keypoints, confidence_threshold):
@@ -115,7 +114,7 @@ def main():
         kps.append(neckpoint)
         kps.append(hippoint)
         # print(neckpoint)
-        print(len(kps))
+        # print(len(kps))
         # landmarks.append(neckpoint.tolist())
 
         # print(kps)
