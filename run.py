@@ -1,8 +1,9 @@
-import tensorflow as tf
-import numpy as np
-import cv2
-import json
 import argparse
+import json
+
+import cv2
+import numpy as np
+import tensorflow as tf
 
 
 def drawKeypoints(frame, keypoints, confidence_threshold):
