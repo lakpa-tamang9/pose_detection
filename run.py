@@ -13,8 +13,7 @@ import argparse
 
 
 
-with open("./mapping.json", "r") as f:
-    myfile = json.load(f)
+
 
 # %%
 def draw_keypoints(frame, keypoints, confidence_threshold):
@@ -83,8 +82,11 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-m", "--model_path", help="Movenetmodel path")
-    parser.add_argument("-f", "--mapping_file", help = "Path to the keypoints mapping json file")
+    parser.add_argument("-f", "--map_file", help = "Path to the keypoints mapping json file")
     args = parser.parse_args()
+    
+    with open(args.map_file, "r") as f:
+        myfile = json.load(f)
 
     cap = cv2.VideoCapture(0)
     while cap.isOpened():
