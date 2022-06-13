@@ -8,15 +8,7 @@ import json
 import argparse
 
 
-
-
-
-
-
-
-
-# %%
-def draw_keypoints(frame, keypoints, confidence_threshold):
+def drawKeypoints(frame, keypoints, confidence_threshold):
     y, x, c = frame.shape
     shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
 
@@ -26,7 +18,7 @@ def draw_keypoints(frame, keypoints, confidence_threshold):
             cv2.circle(frame, (int(kx), int(ky)), 4, (0, 0, 0), 6)
 
 
-def draw_connections(frame, keypoints, edges, confidence_threshold):
+def drawConnections(frame, keypoints, edges, confidence_threshold):
     y, x, c = frame.shape
     shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
 
@@ -38,14 +30,7 @@ def draw_connections(frame, keypoints, edges, confidence_threshold):
         if (c1 > confidence_threshold) & (c2 > confidence_threshold):
             cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 255, 255), 4)
 
-
-# %%
-def calculate_angle(landmark1, landmark2, landmark3):
-    """
-    landmark1 : First point
-    landmark2 : mid point i.e., the vertex
-    landmark3 : last point
-    """
+def calculateAngle(landmark1, landmark2, landmark3):
     a = np.array(landmark1)  # First
     b = np.array(landmark2)  # Mid
     c = np.array(landmark3)  # End
@@ -60,9 +45,7 @@ def calculate_angle(landmark1, landmark2, landmark3):
 
     return angle
 
-
-# %%
-def display_angle(image, angle, value, width, height):
+def displayAngle(image, angle, value, width, height):
     return cv2.putText(
         image,
         str(int(angle)),
@@ -74,7 +57,7 @@ def display_angle(image, angle, value, width, height):
         cv2.LINE_AA,
     )
 
-def midpoint(p1, p2):
+def getMidpoint(p1, p2):
     return list(((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[1] + p2[1]) / 2))
 
 
@@ -84,7 +67,7 @@ def main():
     parser.add_argument("-m", "--model_path", help="Movenetmodel path")
     parser.add_argument("-f", "--map_file", help = "Path to the keypoints mapping json file")
     args = parser.parse_args()
-    
+
     with open(args.map_file, "r") as f:
         myfile = json.load(f)
 
@@ -127,9 +110,9 @@ def main():
         # 17 and 18 index are appended to the existing list
 
         # print(left_shoulder)
-        neckpoint = midpoint(landmarks[5], landmarks[6])
+        neckpoint = getMidpoint(landmarks[5], landmarks[6])
         # print(neckpoint)
-        hippoint = midpoint(landmarks[11], landmarks[12])
+        hippoint = getMidpoint(landmarks[11], landmarks[12])
         kps = landmarks.tolist()
         kps.append(neckpoint)
         kps.append(hippoint)
@@ -140,26 +123,26 @@ def main():
         # print(kps)
 
         # right shoulder angle
-        rightshoulderAngle = calculate_angle(left_shoulder, right_shoulder, right_elbow)
-        display_angle(frame, rightshoulderAngle, right_shoulder, width, height)
+        rightshoulderAngle = calculateAngle(left_shoulder, right_shoulder, right_elbow)
+        displayAngle(frame, rightshoulderAngle, right_shoulder, width, height)
 
         # left shoulder angle
-        leftshoulderAngle = calculate_angle(right_shoulder, left_shoulder, left_elbow)
-        display_angle(frame, leftshoulderAngle, left_shoulder, width, height)
+        leftshoulderAngle = calculateAngle(right_shoulder, left_shoulder, left_elbow)
+        displayAngle(frame, leftshoulderAngle, left_shoulder, width, height)
 
         # left elbow angle
-        leftelbowAngle = calculate_angle(left_shoulder, left_elbow, left_wrist)
-        display_angle(frame, leftelbowAngle, left_elbow, width, height)
+        leftelbowAngle = calculateAngle(left_shoulder, left_elbow, left_wrist)
+        displayAngle(frame, leftelbowAngle, left_elbow, width, height)
 
         # right elbow angle
-        rightelbowAngle = calculate_angle(right_shoulder, right_elbow, right_wrist)
-        display_angle(frame, rightelbowAngle, right_elbow, width, height)
+        rightelbowAngle = calculateAngle(right_shoulder, right_elbow, right_wrist)
+        displayAngle(frame, rightelbowAngle, right_elbow, width, height)
 
         # print(rightshoulderAngle)
 
         # Rendering
-        draw_connections(frame, kps, myfile["edge_mapping"], 0.4)
-        draw_keypoints(frame, kps, 0.4)
+        drawConnections(frame, kps, myfile["edge_mapping"], 0.4)
+        drawKeypoints(frame, kps, 0.4)
 
         cv2.imshow("MoveNet Lightning", frame)
 
