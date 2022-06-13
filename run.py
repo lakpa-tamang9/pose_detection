@@ -1,15 +1,16 @@
 # %%
+from email import parser
 import tensorflow as tf
 import numpy as np
 from matplotlib import pyplot as plt
 import cv2
 import json
+import argparse
 
-# %%
-interpreter = tf.lite.Interpreter(
-    model_path="./lite-model_movenet_singlepose_thunder_3.tflite"
-)
-interpreter.allocate_tensors()
+
+
+
+
 
 
 with open("./mapping.json", "r") as f:
@@ -74,13 +75,17 @@ def display_angle(image, angle, value, width, height):
         cv2.LINE_AA,
     )
 
-
-# %%
 def midpoint(p1, p2):
     return list(((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[1] + p2[1]) / 2))
 
 
 def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-m", "--model_path", help="Movenetmodel path")
+    parser.add_argument("-f", "--mapping_file", help = "Path to the keypoints mapping json file")
+    args = parser.parse_args()
+
     cap = cv2.VideoCapture(0)
     while cap.isOpened():
         _, frame = cap.read()
@@ -90,6 +95,8 @@ def main():
         height, width, _ = img.shape
         img = tf.image.resize_with_pad(np.expand_dims(img, axis=0), 256, 256)
         input_image = tf.cast(img, dtype=tf.float32)
+        interpreter = tf.lite.Interpreter(model_path=args.model_path)
+        interpreter.allocate_tensors()
 
         # Setup input and output
         input_details = interpreter.get_input_details()
