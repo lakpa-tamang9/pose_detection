@@ -1,27 +1,43 @@
-import mediapipe
 import cv2
+import mediapipe as mp
+import time
 
-print("Loading raspberry PI 4")
-# define a video capture object
-vid = cv2.VideoCapture(0)
 
-while True:
+class PoseDetector:
+    def __init__(
+        self, mode=False, upBody=False, smooth=True, detectionCon=0.5, trackCon=0.5
+    ):
 
-    # Capture the video frame
-    # by frame
-    ret, frame = vid.read()
-    if ret:
+        self.mode = mode
+        self.upBody = upBody
+        self.smooth = smooth
+        self.detectionCon = detectionCon
+        self.trackCon = trackCon
 
-        # Display the resulting frame
-        cv2.imshow("frame", frame)
+        self.mpDraw = mp.solutions.drawing_utils
+        self.mpPose = mp.solutions.pose
+        self.pose = self.mpPose.Pose(
+            self.mode, self.upBody, self.smooth, self.detectionCon, self.trackCon
+        )
 
-    # the 'q' button is set as the
-    # quitting button you may use any
-    # desired button of your choice
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+    def findPose(self, img, draw=True):
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.pose.process(imgRGB)
+        if self.results.pose_landmarks:
+            if draw:
+                self.mpDraw.draw_landmarks(
+                    img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS
+                )
 
-# After the loop release the cap object
-vid.release()
-# Destroy all the windows
-cv2.destroyAllWindows()
+        return img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS
+
+    def getPosition(self, img, draw=True):
+        lmList = []
+        if self.results.pose_landmarks:
+            for id, lm in enumerate(self.results.pose_landmarks.landmark):
+                h, w, c = img.shape
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                lmList.append([id, cx, cy])
+                if draw:
+                    cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
+        return lmList
